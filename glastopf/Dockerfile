@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV logfile /var/log/install.log
 
 RUN echo "Creating new Docker container for Project Glastopf" | tee -a "${logfile}"
-RUN echo $(date) | tee -a $logfil
+RUN echo $(date) | tee -a "${logfile}"
 
 #sources
 RUN sed -i '1ideb mirror://mirrors.ubuntu.com/mirrors.txt trusty main restricted universe multiverse'     /etc/apt/sources.list
