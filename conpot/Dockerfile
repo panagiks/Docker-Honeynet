@@ -4,7 +4,7 @@ FROM ubuntu:latest
 
 MAINTAINER Spenser Reinhardt
 ENV DEBIAN_FRONTEND noninteractive
-ENV logfile $HOME/install.log
+ENV logfile /var/log/install.log
 
 RUN echo "Creating new Docker container for Conpot.." | tee -a "${logfile}"
 RUN echo $(date) | tee -a "${logfile}"
