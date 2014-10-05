@@ -40,6 +40,7 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ADD kippo.cfg /opt/kippo/kippo.cfg
 EXPOSE 2222
+USER kippo
 WORKDIR /opt/kippo/
 VOLUME /opt/kippo/var/
 CMD ["./start.sh"]
