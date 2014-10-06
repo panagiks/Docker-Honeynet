@@ -18,11 +18,11 @@ RUN sed -i '1ideb mirror://mirrors.ubuntu.com/mirrors.txt trusty-security main r
 #dependencies
 RUN echo "Installing prereqs" | tee -a "${logfile}"
 RUN apt-get update -y 2>&1 | tee -a "${logfile}"
-RUN apt-get install libsmi2ldbl snmp-mibs-downloader -y 2>&1 | tee -a "${logfile}"
+RUN apt-get install git-core python python-dev libmysqlclient-dev libxslt1-dev libsmi2ldbl snmp-mibs-downloader -y 2>&1 | tee -a "${logfile}"
 
 #Build here
 WORKDIR /opt/
-RUN git clone git@github.com:glastopf/conpot.git 2>&1 | tee -a "${logfile}"
+RUN git clone https://github.com/glastopf/conpot.git 2>&1 | tee -a "${logfile}"
 WORKDIR conpot/
 RUN python setup.py install 2>&1 | tee -a "${logfile}"
 
@@ -41,4 +41,5 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 EXPOSE 80 161 503
 WORKDIR /opt/conpot
 VOLUME /opt/conpot/var/
-CMD ["conpot", "-c /opt/conpot/conpot.cfg", ">> var/conpot.log"]
+ENTRYPOINT ["/usr/bin/python"]
+CMD ["/opt/conpot/bin/conpot", "-c /opt/conpot/conpot.cfg", "-t /opt/conpot/conpot/templates/default.xml", "-w /opt/conpot/conpot/templates/www/default/htdocs", "-l /opt/conpot/var/conpot.log"]
