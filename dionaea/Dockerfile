@@ -26,7 +26,8 @@ WORKDIR /opt/dionaea/
 RUN git clone git://git.carnivore.it/libemu.git libemu 2>&1 | tee -a "${logfile}"
 WORKDIR libemu/
 RUN  autoreconf -vi 2>&1 | tee -a "${logfile}"
-RUN ./configure --prefix=/opt/dionaea 2>&1 | tee -a "${logfile}"
+RUN ./configure --prefix=/opt/dionaea --enable-python-bindings 2>&1 | tee -a "${logfile}"
+RUN sed -i 's/ -Werror//g' /opt/dionaea/libemu/src/Makefile
 RUN  make install 2>&1 | tee -a "${logfile}"
 WORKDIR /opt/dionaea/
 
@@ -93,6 +94,19 @@ RUN ./configure --with-lcfg-include=/opt/dionaea/include/ \
 --with-pcap-include=/opt/dionaea/include \
 --with-pcap-lib=/opt/dionaea/lib/ \
 2>&1 | tee -a "${logfile}"
+
+# changes needed thanks to automake
+RUN for file in $(find ./ -name Makefile); do \
+	echo "Removing -Werror from ${file}" | tee -a "${logfile}"; \
+	sed -i 's/-Werror//g' ${file}; \
+done
+RUN for file in $(find ./ -name Makefile); \
+	do echo "Correcting SSL libs in ${file}" | tee -a "${logfile}"; \
+	sed -i 's/LIB_SSL_LIBS = -lssl/LIB_SSL_LIBS = -lssl -lcrypto/g' ${file}; \
+done
+RUN sed -i 's/-Werror//g' /opt/dionaea/dionaea/modules/python/setup.py
+
+#Make dionaea
 RUN make 2>&1 | tee -a "${logfile}"
 RUN make install 2>&1 | tee -a "${logfile}"
 
@@ -108,4 +122,4 @@ RUN rm -f /opt/dionaea/libpcap-1.1.1.tar.gz /opt/dionaea/Python-3.2.2/Cython-0.1
 #post build
 EXPOSE 80 443
 WORKDIR /opt/dionaea
-CMD ["/opt/dionaea/bin/dionaea", "-D -l all -L '*' -u nobody -g nobody -r /opt/dionaea/ -w /opt/dionaea/ -p /opt/dionaea/var/dionaea.pid -c /opt/dionaea/etc/dionaea.conf" ]
+CMD ["/opt/dionaea/bin/dionaea", "-l all -L '*' -u nobody -g nogroup -r /opt/dionaea/ -w /opt/dionaea/ -p /opt/dionaea/var/dionaea.pid -c /opt/dionaea/etc/dionaea/dionaea.conf" ]
