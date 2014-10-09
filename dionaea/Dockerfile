@@ -93,7 +93,7 @@ autoreconf -vi && \
 # changes needed thanks to automake
 RUN for file in $(find ./ -name Makefile); do \
 	sed -i 's/LIB_SSL_LIBS = -lssl/LIB_SSL_LIBS = -lssl -lcrypto/g' ${file}; \
-done && \
+done
 
 #Make dionaea
 RUN make && \
