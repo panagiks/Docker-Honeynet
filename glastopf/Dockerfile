@@ -17,7 +17,7 @@ apt-get install git-core lsb-release python2.7 python-openssl python-gevent libe
 python-chardet python-requests python-sqlalchemy python-lxml python-beautifulsoup mongodb python-pip \ 
 python-dev python-setuptools g++ git php5 php5-dev liblapack-dev gfortran libmysqlclient-dev libxml2-dev \
 libxslt-dev -y && \
-pip install --upgrade distribute -y
+pip install --upgrade distribute
 
 WORKDIR /opt/
 
