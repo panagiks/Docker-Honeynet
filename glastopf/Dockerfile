@@ -4,62 +4,41 @@ FROM ubuntu:latest
 
 MAINTAINER Spenser Reinhardt
 ENV DEBIAN_FRONTEND noninteractive
-ENV logfile /var/log/install.log
-
-RUN echo "Creating new Docker container for Project Glastopf" | tee -a "${logfile}"
-RUN echo $(date) | tee -a "${logfile}"
 
 #sources
-RUN sed -i '1ideb mirror://mirrors.ubuntu.com/mirrors.txt trusty main restricted universe multiverse'     /etc/apt/sources.list
-RUN sed -i '1ideb mirror://mirrors.ubuntu.com/mirrors.txt trusty-updates main restricted universe multiverse' /etc/apt/sources.list
-RUN sed -i '1ideb mirror://mirrors.ubuntu.com/mirrors.txt trusty-backports main restricted universe multiverse' /etc/apt/sources.list
-RUN sed -i '1ideb mirror://mirrors.ubuntu.com/mirrors.txt trusty-security main restricted universe multiverse' /etc/apt/sources.list
+RUN sed -i '1ideb mirror://mirrors.ubuntu.com/mirrors.txt trusty main restricted universe multiverse'     /etc/apt/sources.list && \
+sed -i '1ideb mirror://mirrors.ubuntu.com/mirrors.txt trusty-updates main restricted universe multiverse' /etc/apt/sources.list && \
+sed -i '1ideb mirror://mirrors.ubuntu.com/mirrors.txt trusty-backports main restricted universe multiverse' /etc/apt/sources.list && \
+sed -i '1ideb mirror://mirrors.ubuntu.com/mirrors.txt trusty-security main restricted universe multiverse' /etc/apt/sources.list && \
 
 # updates and prereqs
-RUN sudo apt-get update -y
-RUN sudo apt-get install git lsb-release -y
-
-#prereqs
-RUN echo "Installing prereqs" | tee -a "${logfile}"
-RUN apt-get install python2.7 python-openssl python-gevent libevent-dev python2.7-dev build-essential make \
+RUN apt-get update -y && \
+apt-get install git-core lsb-release python2.7 python-openssl python-gevent libevent-dev python2.7-dev build-essential make \
 python-chardet python-requests python-sqlalchemy python-lxml python-beautifulsoup mongodb python-pip \ 
 python-dev python-setuptools g++ git php5 php5-dev liblapack-dev gfortran libmysqlclient-dev libxml2-dev \
-libxslt-dev -y 2>&1 | tee -a "${logfile}"
-RUN pip install --upgrade distribute -y 2>&1 | tee -a "${logfile}"
+libxslt-dev -y && \
+pip install --upgrade distribute -y
+
+WORKDIR /opt/
 
 #checout and build latest php sandbox
-RUN echo "Cloning and building PHP sandbox" | tee -a "${logfile}"
-WORKDIR /opt/
-RUN git clone git://github.com/glastopf/BFR.git 2>&1 | tee -a "${logfile}"
-WORKDIR BFR/
-RUN phpize 2>&1 | tee -a "${logfile}"
-RUN ./configure --enable-bfr 2>&1 | tee -a "${logfile}"
-RUN make 2>&1 | tee -a "${logfile}"
-RUN make install 2>&1 | tee -a "${logfile}"
-RUN for i in $(find / -type f -name php.ini); do \
+RUN git clone git://github.com/glastopf/BFR.git && \
+cd BFR/ && \
+phpize && \
+./configure --enable-bfr && \
+make && \
+make install && \
+for i in $(find / -type f -name php.ini); do \
 	sed -i "/[PHP]/azend_extension=$(find /usr/lib/php5 -type f -name bfr.so)" $i; \
 done    
 
 #Clone and build glastopf
-RUN echo "Cloning and building Glastopf" | tee -a "${logfile}"
-WORKDIR /opt/
-RUN git clone https://github.com/glastopf/glastopf.git 2>&1 | tee -a "${logfile}"
-WORKDIR glastopf/
-RUN python setup.py install 2>&1 | tee -a "${logfile}"
+RUN git clone https://github.com/glastopf/glastopf.git && \
+cd glastopf/ && \
+python setup.py install
        
 #Make dir for glastopf env
-RUN echo "Making glastopf environment" | tee -a $loglfile
-WORKDIR /opt/
 RUN mkdir myhoneypot
-WORKDIR myhoneypot/
-
-#Initialize config - might be causing build timeout
-#RUN glastopf-runner 2>&1 | tee -a "${logfile}"
-
-#Finished
-RUN echo "Finished build correctly - Enjoy!" | tee -a "${logfile}"
-RUN echo $(date) | tee -a "${logfile}"
-RUN if [[ -f $logfile ]]; then mv $logfile /opt/thug/install.log; else echo "No log, use docker's"; fi
 
 # Clean up when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* ./install.sh
