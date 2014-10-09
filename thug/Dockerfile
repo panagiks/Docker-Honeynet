@@ -17,7 +17,7 @@ sed -i '1ideb mirror://mirrors.ubuntu.com/mirrors.txt trusty-security main restr
 RUN apt-get update -y && \
 apt-get install -y python2.7 python2.7-dev python-pip python-beautifulsoup python-html5lib \
 libemu2 libemu-dev python-libemu python-pefile python-lxml python-chardet python-httplib2 \
-python-requests libboost-all-dev libboost-python-dev python-cssutils zope* python-pygraphviz\
+python-requests libboost-all-dev libboost-python-dev python-cssutils zope* python-pygraphviz \
 python-pyparsing python-pydot python-magic python-yara libyara2 mongodb python-pymongo \
 python-librabbitmq python-pika python-setuptools libxml2-dev libxslt-dev graphviz mongodb \
 build-essential autoconf libtool subversioni wget git-core bison
