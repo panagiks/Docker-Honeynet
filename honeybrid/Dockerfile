@@ -12,9 +12,9 @@ sed -i '1ideb mirror://mirrors.ubuntu.com/mirrors.txt trusty-security main restr
 
 #dependencies
 RUN apt-get update -y && \
-apt-get install automake autoconf git-core make build-essential binutils gcc flex byacc libnetfilter-conntrack-dev \
+apt-get install automake autoconf git-core libtool make build-essential binutils gcc flex byacc libnetfilter-conntrack-dev \
 libnetfilter-queue-dev libnetfilter-queue1 libnfnetlink-dev libnfnetlink0 pkg-config libc6-dev libglib2.0-0 libglib2.0-dev \
-linux-libc-dev libgloox-dev libxml2-dev libxml++ libpcap0.8-dev libpcap0.8 libdumbnet-dev openssl libssl-dev libev-dev -y
+linux-libc-dev libgloox-dev libxml2-dev libxml++ libpcap0.8-dev libpcap0.8 libdumbnet-dev openssl libssl-dev libev-dev libc6 -y
 
 #honeybrid build and install
 RUN cd /tmp/ && \
