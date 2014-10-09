@@ -33,7 +33,7 @@ for i in $(find / -type f -name php.ini); do \
 done    
 
 #Clone and build glastopf
-RUN git clone https://github.com/glastopf/glastopf.git && \
+RUN git clone https://github.com/glastopf/glastopf.git glastopf && \
 cd glastopf/ && \
 python setup.py install
        
