@@ -38,7 +38,7 @@ make && \
 make install
 
 #libev
-RUN wget http://dist.schmorp.de/libev/Attic/libev-4.04.tar.gz /opt/dionaea/libev-4.04.tar.gz && \
+RUN wget http://dist.schmorp.de/libev/Attic/libev-4.04.tar.gz && \
 tar xfzv libev-4.04.tar.gz && \
 cd libev-4.04/ && \
 ./configure --prefix=/opt/dionaea --disable-werror && \
