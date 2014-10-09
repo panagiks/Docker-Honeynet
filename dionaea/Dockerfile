@@ -91,7 +91,7 @@ autoreconf -vi && \
 --with-ssl-lib=/usr/lib/x86_64-linux-gnu/
 
 # changes needed thanks to automake
-RUN for file in $(find ./ -name Makefile); \
+RUN for file in $(find ./ -name Makefile); do \
 	sed -i 's/LIB_SSL_LIBS = -lssl/LIB_SSL_LIBS = -lssl -lcrypto/g' ${file}; \
 done && \
 
