@@ -20,7 +20,7 @@ libemu2 libemu-dev python-libemu python-pefile python-lxml python-chardet python
 python-requests libboost-all-dev libboost-python-dev python-cssutils zope* python-pygraphviz \
 python-pyparsing python-pydot python-magic python-yara libyara2 mongodb python-pymongo \
 python-librabbitmq python-pika python-setuptools libxml2-dev libxslt-dev graphviz mongodb \
-build-essential autoconf libtool subversioni wget git-core bison
+build-essential autoconf libtool subversion wget git-core bison libc6
 
 #google-v8
 RUN svn checkout http://v8.googlecode.com/svn/trunk/ && \
