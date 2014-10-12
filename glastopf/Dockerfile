@@ -44,5 +44,6 @@ RUN mkdir myhoneypot
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* ./install.sh
 
 EXPOSE 80 443
+VOLUME /opt/myhoneynet/log
 WORKDIR /opt/myhoneypot
 CMD ["glastopf-runner"]
