@@ -34,5 +34,5 @@ ADD kippo.cfg /opt/kippo/kippo.cfg
 EXPOSE 2222
 USER kippo
 WORKDIR /opt/kippo/
-VOLUME /opt/kippo/var/
+VOLUME /opt/kippo/log/
 CMD ["./start.sh"]
