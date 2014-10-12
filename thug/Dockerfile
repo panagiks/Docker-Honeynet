@@ -72,6 +72,7 @@ mkdir -p thug/var/log thug/var/out thug/var/in
 #cleanup
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+VOLUME /opt/thug/var/log
 WORKDIR /opt/thug/
 ENTRYPOINT ["/bin/bash"]
 CMD ["-c", \
