@@ -24,8 +24,8 @@ make install
 RUN git clone git://git.carnivore.it/libemu.git && \
 cd libemu/ && \
 autoreconf -vi && \
-./configure --prefix=/opt/dionaea --enable-python-bindings --disable-werror && \
-sed -i 's/ -Werror//g' /opt/dionaea/libemu/src/Makefile && \
+./configure --prefix=/opt/dionaea --enable-python-bindings && \
+sed -i 's/-Werror//g' src/Makefile && \
 make install
 
 #libnl - could be installed via apt, but git is prefered
@@ -92,7 +92,7 @@ autoreconf -vi && \
 
 # changes needed thanks to automake
 RUN for file in $(find ./ -name Makefile); do \
-	sed -i 's/LIB_SSL_LIBS = -lssl/LIB_SSL_LIBS = -lssl -lcrypto/g' ${file}; \
+	sed -i 's/LIB_SSL_LIBS =/LIB_SSL_LIBS = -lcrypto/g' ${file}; \
 done
 
 #Make dionaea
@@ -104,6 +104,7 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
 rm -f /opt/dionaea/libpcap-1.1.1.tar.gz /opt/dionaea/Python-3.2.2/Cython-0.15.tar.gz /opt/dionaea/Python-3.2.2.tgz /opt/dionaea/libev-4.04.tar.gz 
 
 #post build
-EXPOSE 80 443
+EXPOSE 21 69 80 135 443 445 1443 3306 5061 5062
+VOLUME /opt/dionaea/var/log
 ENTRYPOINT ["/opt/dionaea/bin/dionaea"]
 CMD ["-l", "all", "-L", "'*'", "-u", "nobody", "-g", "nogroup", "-r", "/opt/dionaea/", "-w", "/opt/dionaea/", "-p", "/opt/dionaea/var/dionaea.pid", "-c", "/opt/dionaea/etc/dionaea/dionaea.conf" ]
