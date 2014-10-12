@@ -26,8 +26,8 @@ python setup.py install
 #Add config
 ADD conpot.cfg /opt/conpot/conpot.cfg
 
-EXPOSE 80 161 503
+EXPOSE 80 102 161 503
 WORKDIR /opt/conpot
 VOLUME /opt/conpot/var/
 ENTRYPOINT ["/usr/bin/python"]
-CMD ["/opt/conpot/bin/conpot", "-c", "/opt/conpot/conpot.cfg", "-t", "/opt/conpot/conpot/templates/default.xml", "-w", "/opt/conpot/conpot/templates/www/default/htdocs", "-l", "/opt/conpot/var/conpot.log"]
+CMD ["/opt/conpot/bin/conpot", "-c", "/opt/conpot/conpot.cfg", "-t", "/opt/conpot/conpot/templates/default/", "-l", "/opt/conpot/var/conpot.log"]
