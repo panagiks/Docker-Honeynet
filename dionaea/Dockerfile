@@ -4,79 +4,75 @@ FROM ubuntu:latest
 
 MAINTAINER Spenser Reinhardt
 ENV DEBIAN_FRONTEND noninteractive
-ENV logfile /var/log/install.log
 
 #install deps
-RUN apt-get update 2>&1 | tee "${logfile}"
-RUN apt-get install libudns-dev libglib2.0-dev libssl-dev libcurl4-openssl-dev libreadline-dev libsqlite3-dev python-dev libtool automake autoconf build-essential subversion git-core flex bison pkg-config wget -y 2>&1 | tee -a "${logfile}"
+RUN apt-get update && \
+apt-get install libudns-dev libglib2.0-dev libssl-dev libcurl4-openssl-dev libreadline-dev libsqlite3-dev python-dev libtool automake autoconf build-essential subversion git-core flex bison pkg-config wget -y
 
 #make build and install dir
 RUN mkdir -p /opt/dionaea
 WORKDIR /opt/dionaea/
 
 #liblcfg
-RUN git clone git://git.carnivore.it/liblcfg.git liblcfg 2>&1 | tee -a "${logfile}"
-WORKDIR liblcfg/code/
-RUN autoreconf -vi 2>&1 | tee -a "${logfile}"
-RUN ./configure --prefix=/opt/dionaea 2>&1 | tee -a "${logfile}"
-RUN make install 2>&1 | tee -a "${logfile}"
-WORKDIR /opt/dionaea/
+RUN git clone git://git.carnivore.it/liblcfg.git liblcfg && \
+cd liblcfg/code/ && \
+autoreconf -vi && \
+./configure --prefix=/opt/dionaea --disable-werror && \
+make install
 
 #libemu
-RUN git clone git://git.carnivore.it/libemu.git libemu 2>&1 | tee -a "${logfile}"
-WORKDIR libemu/
-RUN  autoreconf -vi 2>&1 | tee -a "${logfile}"
-RUN ./configure --prefix=/opt/dionaea 2>&1 | tee -a "${logfile}"
-RUN  make install 2>&1 | tee -a "${logfile}"
-WORKDIR /opt/dionaea/
+RUN git clone git://git.carnivore.it/libemu.git && \
+cd libemu/ && \
+autoreconf -vi && \
+./configure --prefix=/opt/dionaea --enable-python-bindings && \
+sed -i 's/-Werror//g' src/Makefile && \
+make install
 
 #libnl - could be installed via apt, but git is prefered
-RUN git clone git://git.infradead.org/users/tgr/libnl.git 2>&1 | tee -a "${logfile}"
-WORKDIR libnl/
-RUN autoreconf -vi 2>&1 | tee -a "${logfile}"
-RUN export LDFLAGS=-Wl,-rpath,/opt/dionaea/lib
-RUN ./configure --prefix=/opt/dionaea 2>&1 | tee -a "${logfile}"
-RUN make 2>&1 | tee -a "${logfile}"
-RUN make install 2>&1 | tee -a "${logfile}"
-WORKDIR /opt/dionaea
+RUN git clone git://git.infradead.org/users/tgr/libnl.git && \
+cd libnl/ && \
+autoreconf -vi && \
+export LDFLAGS=-Wl,-rpath,/opt/dionaea/lib && \
+./configure --prefix=/opt/dionaea --disable-werror && \
+make && \
+make install
 
 #libev
-ADD http://dist.schmorp.de/libev/Attic/libev-4.04.tar.gz /opt/dionaea/libev-4.04.tar.gz
-RUN tar xfzv libev-4.04.tar.gz 2>&1 | tee -a "${logfile}"
-WORKDIR libev-4.04
-RUN ./configure --prefix=/opt/dionaea 2>&1 | tee -a "${logfile}"
-RUN make install 2>&1 | tee -a "${logfile}"
-WORKDIR /opt/dionaea
+RUN wget http://dist.schmorp.de/libev/Attic/libev-4.04.tar.gz && \
+tar xfzv libev-4.04.tar.gz && \
+cd libev-4.04/ && \
+./configure --prefix=/opt/dionaea --disable-werror && \
+make install
 
 #python 3.3
-ADD http://www.python.org/ftp/python/3.2.2/Python-3.2.2.tgz /opt/dionaea/Python-3.2.2.tgz
-RUN tar xfzv Python-3.2.2.tgz 2>&1 | tee -a "${logfile}"
-WORKDIR Python-3.2.2/
-RUN ./configure --enable-shared --prefix=/opt/dionaea --with-computed-gotos --enable-ipv6 LDFLAGS="-Wl,-rpath=/opt/dionaea/lib/ -L/usr/lib/x86_64-linux-gnu/" 2>&1 | tee -a "${logfile}"
-RUN make 2>&1 | tee -a "${logfile}"
-RUN make install 2>&1 | tee -a "${logfile}"
+RUN wget http://www.python.org/ftp/python/3.2.2/Python-3.2.2.tgz && \
+tar xfzv Python-3.2.2.tgz && \
+cd Python-3.2.2/ && \
+./configure --enable-shared --prefix=/opt/dionaea --with-computed-gotos --enable-ipv6 LDFLAGS="-Wl,-rpath=/opt/dionaea/lib/ -L/usr/lib/x86_64-linux-gnu/" && \
+make && \
+make install
 
 #cython
-ADD http://cython.org/release/Cython-0.15.tar.gz /opt/dionaea/Python-3.2.2/Cython-0.15.tar.gz
-RUN tar xfzv Cython-0.15.tar.gz 2>&1 | tee -a "${logfile}"
-WORKDIR Cython-0.15/
-RUN /opt/dionaea/bin/python3 setup.py install 2>&1 | tee -a "${logfile}"
-WORKDIR /opt/dionaea/
+RUN cd Python-3.2.2/ && \
+wget http://cython.org/release/Cython-0.15.tar.gz && \
+tar xfzv Cython-0.15.tar.gz && \
+cd Cython-0.15/ && \
+/opt/dionaea/bin/python3 setup.py install
 
 #libpcap
-ADD http://www.tcpdump.org/release/libpcap-1.1.1.tar.gz /opt/dionaea/libpcap-1.1.1.tar.gz
-RUN tar xfzv libpcap-1.1.1.tar.gz 2>&1 | tee -a "${logfile}"
-WORKDIR libpcap-1.1.1/
-RUN ./configure --prefix=/opt/dionaea 2>&1 | tee -a "${logfile}"
-RUN make 2>&1 | tee -a "${logfile}"
-RUN make install 2>&1 | tee -a "${logfile}"
-WORKDIR /opt/dionaea/
+RUN wget http://www.tcpdump.org/release/libpcap-1.1.1.tar.gz && \
+tar xfzv libpcap-1.1.1.tar.gz && \
+cd libpcap-1.1.1/ && \
+./configure --prefix=/opt/dionaea && \
+make && \
+make install
 
 #dionaea
-RUN git clone git://git.carnivore.it/dionaea.git dionaea 2>&1 | tee -a "${logfile}"
-WORKDIR dionaea/
-RUN autoreconf -vi 2>&1 | tee -a "${logfile}"
-RUN ./configure --with-lcfg-include=/opt/dionaea/include/ \
+RUN git clone git://git.carnivore.it/dionaea.git dionaea && \
+cd dionaea/ && \
+autoreconf -vi && \
+./configure --with-lcfg-include=/opt/dionaea/include/ \
+>>>>>>> 65b6700f541f1659df291bdd9252c351144a5b46
 --with-lcfg-lib=/opt/dionaea/lib/ \
 --with-python=/opt/dionaea/bin/python3.2 \
 --with-cython-dir=/opt/dionaea/bin \
@@ -92,20 +88,24 @@ RUN ./configure --with-lcfg-include=/opt/dionaea/include/ \
 --with-curl-config=/usr/bin/ \
 --with-pcap-include=/opt/dionaea/include \
 --with-pcap-lib=/opt/dionaea/lib/ \
-2>&1 | tee -a "${logfile}"
-RUN make 2>&1 | tee -a "${logfile}"
-RUN make install 2>&1 | tee -a "${logfile}"
+--disable-werror \
+--with-ssl-lib=/usr/lib/x86_64-linux-gnu/
 
-#finished
-RUN echo "Done making Dionaea - Enjoy!" | tee -a "${logfile}"
-RUN echo $(date) | tee -a "${logfile}"
+# changes needed thanks to automake
+RUN for file in $(find ./ -name Makefile); do \
+	sed -i 's/LIB_SSL_LIBS =/LIB_SSL_LIBS = -lcrypto/g' ${file}; \
+done
+
+#Make dionaea
+RUN make && \
+make install
 
 #cleanup
-RUN if [[ -f $logfile ]]; then mv "${logfile}" /opt/thug/install.log; else echo "No log, use docker's"; fi
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-RUN rm -f /opt/dionaea/libpcap-1.1.1.tar.gz /opt/dionaea/Python-3.2.2/Cython-0.15.tar.gz /opt/dionaea/Python-3.2.2.tgz /opt/dionaea/libev-4.04.tar.gz 
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+rm -f /opt/dionaea/libpcap-1.1.1.tar.gz /opt/dionaea/Python-3.2.2/Cython-0.15.tar.gz /opt/dionaea/Python-3.2.2.tgz /opt/dionaea/libev-4.04.tar.gz 
 
 #post build
-EXPOSE 80 443
-WORKDIR /opt/dionaea
-CMD ["/opt/dionaea/bin/dionaea", "-D -l all -L '*' -u nobody -g nobody -r /opt/dionaea/ -w /opt/dionaea/ -p /opt/dionaea/var/dionaea.pid -c /opt/dionaea/etc/dionaea.conf" ]
+EXPOSE 21 69 80 135 443 445 1443 3306 5061 5062
+VOLUME /opt/dionaea/var/
+ENTRYPOINT ["/opt/dionaea/bin/dionaea"]
+CMD ["-l", "all", "-L", "'*'", "-u", "nobody", "-g", "nogroup", "-r", "/opt/dionaea/", "-w", "/opt/dionaea/", "-p", "/opt/dionaea/var/dionaea.pid", "-c", "/opt/dionaea/etc/dionaea/dionaea.conf" ]
