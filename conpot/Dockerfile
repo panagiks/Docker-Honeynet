@@ -6,39 +6,28 @@ MAINTAINER Spenser Reinhardt
 ENV DEBIAN_FRONTEND noninteractive
 ENV logfile /var/log/install.log
 
-RUN echo "Creating new Docker container for Conpot.." | tee -a "${logfile}"
-RUN echo $(date) | tee -a "${logfile}"
-
 #apt-get sources
-RUN sed -i '1ideb mirror://mirrors.ubuntu.com/mirrors.txt trusty main restricted universe multiverse'     /etc/apt/sources.list
-RUN sed -i '1ideb mirror://mirrors.ubuntu.com/mirrors.txt trusty-updates main restricted universe multiverse' /etc/apt/sources.list
-RUN sed -i '1ideb mirror://mirrors.ubuntu.com/mirrors.txt trusty-backports main restricted universe multiverse' /etc/apt/sources.list
-RUN sed -i '1ideb mirror://mirrors.ubuntu.com/mirrors.txt trusty-security main restricted universe multiverse' /etc/apt/sources.list
+RUN sed -i '1ideb mirror://mirrors.ubuntu.com/mirrors.txt trusty main restricted universe multiverse'     /etc/apt/sources.list && \
+sed -i '1ideb mirror://mirrors.ubuntu.com/mirrors.txt trusty-updates main restricted universe multiverse' /etc/apt/sources.list && \
+sed -i '1ideb mirror://mirrors.ubuntu.com/mirrors.txt trusty-backports main restricted universe multiverse' /etc/apt/sources.list && \
+sed -i '1ideb mirror://mirrors.ubuntu.com/mirrors.txt trusty-security main restricted universe multiverse' /etc/apt/sources.list
 
 #dependencies
-RUN echo "Installing prereqs" | tee -a "${logfile}"
-RUN apt-get update -y 2>&1 | tee -a "${logfile}"
-RUN apt-get install libsmi2ldbl snmp-mibs-downloader -y 2>&1 | tee -a "${logfile}"
+RUN apt-get update && \
+apt-get install git-core python python-dev libmysqlclient-dev libxslt1-dev libsmi2ldbl snmp-mibs-downloader -y && \
+apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 #Build here
-WORKDIR /opt/
-RUN git clone git@github.com:glastopf/conpot.git 2>&1 | tee -a "${logfile}"
-WORKDIR conpot/
-RUN python setup.py install 2>&1 | tee -a "${logfile}"
-
-#Finished
-RUN echo "Finished build correctly - Enjoy!" | tee -a "${logfile}"
-RUN echo $(date) | tee -a "${logfile}"
-RUN if [[ ! -d /opt/conpot/ ]] || [[ ! -d /opt/conpot/var/ ]]; then mkdir -p /opt/conpot/var/; fi
+RUN cd /opt/ && \
+git clone https://github.com/glastopf/conpot.git && \
+cd conpot/ && \
+python setup.py install
 
 #Add config
 ADD conpot.cfg /opt/conpot/conpot.cfg
 
-#cleanup
-RUN if [[ -f $logfile ]]; then mv "${logfile}" /opt/thug/install.log; else echo "No log, use docker's"; fi
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-EXPOSE 80 161 503
+EXPOSE 80 102 161 503
 WORKDIR /opt/conpot
 VOLUME /opt/conpot/var/
-CMD ["conpot", "-c /opt/conpot/conpot.cfg", ">> var/conpot.log"]
+ENTRYPOINT ["/usr/bin/python"]
+CMD ["/opt/conpot/bin/conpot", "-c", "/opt/conpot/conpot.cfg", "-t", "/opt/conpot/conpot/templates/default/", "-l", "/opt/conpot/var/conpot.log"]
