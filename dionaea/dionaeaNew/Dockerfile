@@ -6,7 +6,7 @@ MAINTAINER Kolokotronis Panagiotis
 
 #Add Host folder with dionaea.conf and DionaeaFR's settings.py
 RUN mkdir /opt/shared
-ADD ~/Dionaea-Docker /opt/shared
+#ADD ~/Dionaea-Docker /opt/shared
 
 #########################################################################
 ###                           Dionaea                                 ###
@@ -25,7 +25,7 @@ RUN add-apt-repository ppa:honeynet/nightly && \
 RUN apt-get -y install dionaea
 
 #Install dependencies not installed by apt
-RUN apt-get -y install postgresql cython unzip sqlite3 sqlite
+RUN apt-get -y install git postgresql cython unzip sqlite3 sqlite
 
 #Install and configure p0f fingerprinting library
 RUN apt-get -y install p0f && \
@@ -36,7 +36,8 @@ RUN apt-get -y install p0f && \
 #sudo chown nobody:nogroup /tmp/p0f.sock
 
 #Copy dionaea.conf from share folder
-RUN cp /opt/shared/dionaea.conf /etc/dionaea/dionaea.conf
+#RUN cp /opt/shared/dionaea.conf /etc/dionaea/dionaea.conf
+COPY dionaea.conf /etc/dionaea/
 
 #Start dionaea service
 #RUN sudo service dionaea start 
@@ -49,7 +50,7 @@ RUN cp /opt/shared/dionaea.conf /etc/dionaea/dionaea.conf
 RUN apt-get -y install python-pip python-netaddr
 
 #Install dependencies with pip
-RUN pip install Django=1.8.11 && \
+RUN pip install Django==1.8.11 && \
     pip install pygeoip && \
     pip install django-pagination && \
     pip install django-tables2 && \
@@ -91,7 +92,8 @@ RUN wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz &
     mv GeoLiteCity.dat DionaeaFR/DionaeaFR/static
 
 #Copy settings.py form shared folder
-RUN cp /opt/shared/settings.py /opt/DionaeaFR/DionaeaFR/settings.py
+#RUN cp /opt/shared/settings.py /opt/DionaeaFR/DionaeaFR/settings.py
+COPY settings.py /opt/DionaeaFR/DionaeaFR/
 
 #Make dir and pid file for DionaeaFR
 RUN mkdir /var/run/dionaeafr && \
