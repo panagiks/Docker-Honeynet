@@ -2,8 +2,8 @@
 #start with ubuntu
 FROM ubuntu:trusty
 
-MAINTAINER Spenser Reinhardt
-ENV DEBIAN_FRONTEND noninteractive
+MAINTAINER Kolokotronis Panagiotis
+#ENV DEBIAN_FRONTEND noninteractive
 
 #########################################################################
 ###                           Dionaea                                 ###
@@ -102,6 +102,6 @@ sudo python manage.py runserver 0.0.0.0:9985
 
 #post build
 EXPOSE 1-65535
-VOLUME /opt/dionaea/var/
-ENTRYPOINT ["/opt/dionaea/bin/dionaea"]
-CMD ["-l", "all", "-L", "'*'", "-u", "nobody", "-g", "nogroup", "-r", "/opt/dionaea/", "-w", "/opt/dionaea/", "-p", "/opt/dionaea/var/dionaea.pid", "-c", "/opt/dionaea/etc/dionaea/dionaea.conf" ]
+#VOLUME /opt/dionaea/var/
+#ENTRYPOINT ["/opt/dionaea/bin/dionaea"]
+#CMD ["-l", "all", "-L", "'*'", "-u", "nobody", "-g", "nogroup", "-r", "/opt/dionaea/", "-w", "/opt/dionaea/", "-p", "/opt/dionaea/var/dionaea.pid", "-c", "/opt/dionaea/etc/dionaea/dionaea.conf" ]
