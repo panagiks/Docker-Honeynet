@@ -22,13 +22,13 @@ RUN add-apt-repository ppa:honeynet/nightly && \
     apt-get update
 
 #Install Dionaea
-RUN apt-get install dionaea
+RUN apt-get -y install dionaea
 
 #Install dependencies not installed by apt
-RUN apt-get install postgresql cython unzip sqlite3 sqlite
+RUN apt-get -y install postgresql cython unzip sqlite3 sqlite
 
 #Install and configure p0f fingerprinting library
-RUN apt-get install p0f && \
+RUN apt-get -y install p0f && \
     mkdir /noneexistent && \
     chown -R nobody:nogroup /nonexistent && \
     mkdir /var/p0f
@@ -46,7 +46,7 @@ RUN cp /opt/shared/dionaea.conf /etc/dionaea/dionaea.conf
 #########################################################################
 
 #Install pip and python-netaddr
-RUN apt-get install python-pip python-netaddr
+RUN apt-get -y install python-pip python-netaddr
 
 #Install dependencies with pip
 RUN pip install Django=1.8.11 && \
@@ -69,7 +69,7 @@ RUN cd /opt && \
     python setup.py install
 
 #Install nodejs and npm
-RUN apt-get install nodejs npm
+RUN apt-get -y install nodejs npm
 
 #Symlink nodejs to node
 RUN ln -s "$(which nodejs)" /usr/bin/node
