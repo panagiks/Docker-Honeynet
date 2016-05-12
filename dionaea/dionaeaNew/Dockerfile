@@ -15,7 +15,7 @@ ADD ~/Dionaea-Docker /opt/shared
 RUN apt-get -y update && \
     apt-get -y upgrade && \
     apt-get -y dist-upgrade && \
-    apt-get install software-properties-common
+    apt-get -y install software-properties-common
 
 #Add PPA
 RUN add-apt-repository ppa:honeynet/nightly && \
