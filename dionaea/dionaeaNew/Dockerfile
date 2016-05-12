@@ -1,4 +1,4 @@
-#dionaea
+#dionaea with DionaeaFR
 #start with ubuntu
 FROM ubuntu:trusty
 
