@@ -96,7 +96,7 @@ sudo touch /var/run/dionaeafr/dionaeafr.pid
 
 #Ready & Run DionaeaFR
 RUN cd DionaeaFR && \
-sudo python manage.py collectstatic #type ‘yes’ when prompted && \
+echo 'yes' | sudo python manage.py collectstatic && \
 sudo python manage.py migrate && \
 sudo python manage.py runserver 0.0.0.0:9985 
 
