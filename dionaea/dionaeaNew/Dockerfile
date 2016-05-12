@@ -25,7 +25,7 @@ RUN add-apt-repository ppa:honeynet/nightly && \
 RUN apt-get -y install dionaea
 
 #Install dependencies not installed by apt
-RUN apt-get -y install git postgresql cython unzip sqlite3 sqlite
+RUN apt-get -y install git wget gunzip postgresql cython unzip sqlite3 sqlite
 
 #Install and configure p0f fingerprinting library
 RUN apt-get -y install p0f && \
